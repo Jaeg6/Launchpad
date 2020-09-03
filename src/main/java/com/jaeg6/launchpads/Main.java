@@ -23,6 +23,8 @@ public class Main extends JavaPlugin
     //To store the velocity direction/power properties
     public ArrayList<Vector> vectors = new ArrayList<Vector>();
 
+    public ArrayList<Integer> test = new ArrayList<Integer>();
+
     @Override
     public void onEnable()
     {
@@ -109,9 +111,6 @@ public class Main extends JavaPlugin
                                 return true;
                             }
 
-                            System.out.println(locations.get(0).getBlockZ());
-                            System.out.println(locations.get(1).getBlockZ());
-
                             return true;
 
                         default:
@@ -137,6 +136,32 @@ public class Main extends JavaPlugin
         {
             System.out.println("\nLocations isEmpty: " + locations.isEmpty()
                         + "\n" + "Vectors isEmpty: " + vectors.isEmpty());
+
+            test.add(1);
+            test.add(2);
+            test.add(3);
+            test.add(4);
+
+            getConfig().set("test", test);
+            saveConfig();
+
+            System.out.println("Created test list");
+            return true;
+        }
+        else if(cmd.getName().toLowerCase().equals("lptest"))
+        {
+            if(getConfig().get("test") == null)
+            {
+                System.out.println("No data found");
+                return true;
+            }
+            test = (ArrayList<Integer>) getConfig().get("test");
+
+            for(int i=0; i < 4; i++)
+            {
+                System.out.println(test.get(i));
+            }
+
             return true;
         }
         else

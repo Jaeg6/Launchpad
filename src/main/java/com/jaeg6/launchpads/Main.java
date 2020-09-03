@@ -120,6 +120,7 @@ public class Main extends JavaPlugin
                 }
                 else
                 {
+                    //testing git push
                     sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "please make sure you're looking at a gold pressure plate");
                     sender.sendMessage(ChatColor.RED + "and check your arguments: /<command> <set/clear/check> <x> <y> <z>");
                 }

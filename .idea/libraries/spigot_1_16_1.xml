@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="spigot-1.16.1">
+    <CLASSES>
+      <root url="jar://E:/Documents/BuildTools/spigot-1.16.1.jar!/" />
+      <root url="jar://E:/Documents/BuildTools/craftbukkit-1.16.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://E:/Documents/BuildTools/spigot-1.16.1.jar!/" />
+      <root url="jar://E:/Documents/BuildTools/craftbukkit-1.16.1.jar!/" />
+    </SOURCES>
+  </library>
+</component>

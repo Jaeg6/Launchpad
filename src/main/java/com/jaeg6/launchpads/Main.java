@@ -172,7 +172,8 @@ public class Main extends JavaPlugin
         {
             if(locations.get(i).getX() == location.getX()
             && locations.get(i).getY() == location.getY()
-            && locations.get(i).getZ() == location.getZ())
+            && locations.get(i).getZ() == location.getZ()
+            && locations.get(i).getWorld() == location.getWorld())
             {
                 //location exists
                 //overwrite location
@@ -220,7 +221,8 @@ public class Main extends JavaPlugin
         {
             if(locations.get(i).getX() == location.getX()
             && locations.get(i).getY() == location.getY()
-            && locations.get(i).getZ() == location.getZ())
+            && locations.get(i).getZ() == location.getZ()
+            && locations.get(i).getWorld() == location.getWorld())
             {
                 //location found, remove the properties
                 locations.remove(i);
@@ -246,7 +248,8 @@ public class Main extends JavaPlugin
         {
             if(locations.get(i).getX() == location.getX()
                     && locations.get(i).getY() == location.getY()
-                    && locations.get(i).getZ() == location.getZ())
+                    && locations.get(i).getZ() == location.getZ()
+                    && locations.get(i).getWorld() == location.getWorld())
             {
                 //location found
                 player.sendMessage(ChatColor.GREEN + "Launchpad data found!");
@@ -269,7 +272,8 @@ public class Main extends JavaPlugin
         {
             if(locations.get(i).getX() == location.getX()
                     && locations.get(i).getY() == location.getY()
-                    && locations.get(i).getZ() == location.getZ())
+                    && locations.get(i).getZ() == location.getZ()
+                    && locations.get(i).getWorld() == location.getWorld())
             {
                 //launchpad found
                 vector = vectors.get(i);

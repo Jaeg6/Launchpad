@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -45,5 +46,14 @@ public class Listener implements org.bukkit.event.Listener {
         }
 
         return;
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event)
+    {
+        if(event.getBlock().getBlockData().getMaterial().equals(Material.LIGHT_WEIGHTED_PRESSURE_PLATE))
+        {
+            main.removeLaunchpad(event.getBlock().getLocation());
+        }
     }
 }

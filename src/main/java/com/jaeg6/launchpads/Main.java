@@ -17,9 +17,6 @@ public class Main extends JavaPlugin
     //To store the current locations of activated launchpads
     public ArrayList<Location> locations = new ArrayList<>();
 
-    public ArrayList<Integer> test1 = new ArrayList<>();
-    public ArrayList<Integer> test2 = new ArrayList<>();
-
     //To store the velocity direction/power properties
     public ArrayList<Vector> vectors = new ArrayList<>();
 
@@ -39,7 +36,7 @@ public class Main extends JavaPlugin
 
         if (!(getConfig().get("locations") == null))
         {
-            locations = (ArrayList<Location>) getConfig().get("Locations");
+            locations = (ArrayList<Location>) getConfig().get("locations");
         }
 
         if (!(getConfig().get("vectors") == null))
@@ -59,70 +56,29 @@ public class Main extends JavaPlugin
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
-        try {
-            if (sender instanceof Player) {
-                //TEMPORARY COMMANDS FOR TESTING
-                if (cmd.getName().toLowerCase().equals("lptest1")) {
-                    test1.add(1);
-                    test1.add(2);
-                    test1.add(3);
-
-                    test2.add(6);
-                    test2.add(5);
-                    test2.add(4);
-
-                    getConfig().set("test1", test1);
-                    getConfig().set("test2", test2);
-                    saveConfig();
-
-                    sender.sendMessage("Done. Check console.");
-                    return true;
-                }
-
-                if (cmd.getName().toLowerCase().equals("lptest2")) {
-                    test1.add(4);
-                    test1.add(5);
-                    test1.add(6);
-
-                    test2.add(3);
-                    test2.add(2);
-                    test2.add(1);
-
-                    getConfig().set("test1", test1);
-                    getConfig().set("test2", test2);
-                    saveConfig();
-
-                    sender.sendMessage("Done. Check console.");
-                    return true;
-                }
-                if (cmd.getName().toLowerCase().equals("lpclear")) {
-                    for (int i = test1.size() - 1; i >= 0; i--) {
-                        test1.remove(i);
-                        test2.remove(i);
-                    }
-                    getConfig().set("test1", test1);
-                    getConfig().set("test2", test2);
-                    saveConfig();
-                    return true;
-                }
-                //END OF TEST COMMANDS
-
+        try
+        {
+            if (sender instanceof Player)
+            {
 
                 Player player = (Player) sender;
 
                 //command executed by player
                 String lowerCmd = cmd.getName().toLowerCase();
 
-                if (lowerCmd.equals("lp")) {
+                if (lowerCmd.equals("lp"))
+                {
                     //launchpad command
                     //Check to make sure player is looking at a pressure plate, and one of the commands was executed correctly.
                     Block b = player.getTargetBlock(null, 100);
                     if (b.getBlockData().getMaterial().equals(Material.LIGHT_WEIGHTED_PRESSURE_PLATE)
                             && (args.length == 1 && (args[0].toLowerCase().equals("clear") || args[0].toLowerCase().equals("check"))
-                            || (args.length == 4 && args[0].toLowerCase().equals("set")))) {
+                            || (args.length == 4 && args[0].toLowerCase().equals("set"))))
+                    {
                         System.out.println("Arguments found: " + args.length);
 
-                        switch (args[0].toLowerCase()) {
+                        switch (args[0].toLowerCase())
+                        {
                             case "set":
                                 //Set selected pressure plate to be a launchpad
                                 //If selected plate is already a launchpad; overwrite the old properties.
@@ -143,17 +99,20 @@ public class Main extends JavaPlugin
                                 //search for pressure plate and clear its properties, making it a normal pressure plate again
 
                                 //clear command
-                                sender.sendMessage(ChatColor.GREEN + "Launchpad properties cleared!");
-                                sender.sendMessage((ChatColor.GRAY + "Cleared at: X: " + b.getLocation().getBlockX() + ", Y: " + b.getLocation().getBlockY() + ", Z: " + b.getLocation().getBlockZ()));
+                                if (removeLaunchpad(b.getLocation()))
+                                {
+                                    sender.sendMessage(ChatColor.GREEN + "Launchpad properties cleared!");
+                                    sender.sendMessage((ChatColor.GRAY + "Cleared at: X: " + b.getLocation().getBlockX() + ", Y: " + b.getLocation().getBlockY() + ", Z: " + b.getLocation().getBlockZ()));
+                                }
+                                else
+                                {
+                                    sender.sendMessage(ChatColor.YELLOW + "No launchpad data found at this position!");
+                                }
                                 return true;
 
                             case "check":
                                 //Search through arraylist/config for target plate's velocity properties
-
-                                if (locations.isEmpty()) {
-                                    sender.sendMessage("No data found");
-                                    return true;
-                                }
+                                isLaunchpad(player, b.getLocation());
 
                                 return true;
 
@@ -162,21 +121,29 @@ public class Main extends JavaPlugin
                                 sender.sendMessage(ChatColor.RED + "Try /<command> <set> <x> <y> <z>");
                                 return true;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "please make sure you're looking at a gold pressure plate");
                         sender.sendMessage(ChatColor.RED + "and check your arguments: /<command> <set/clear/check> <x> <y> <z>");
                     }
                     return true;
-                } else {
+                }
+                else
+                {
                     //should use a default "command not recognized" here
                     return true;
                 }
-            } else if (cmd.getName().toLowerCase().equals("lpdebug")) {
+            }
+            else if (cmd.getName().toLowerCase().equals("lpdebug"))
+            {
                 System.out.println("\nLocations isEmpty: " + locations.isEmpty()
                         + "\n" + "Vectors isEmpty: " + vectors.isEmpty());
 
                 return true;
-            } else {
+            }
+            else
+            {
                 System.err.println("This command can only be executed by a player.");
                 return true;
             }
@@ -218,6 +185,10 @@ public class Main extends JavaPlugin
                 vector.setZ(z);
 
                 vectors.set(i, vector);
+
+                getConfig().set("locations", locations);
+                getConfig().set("vectors", vectors);
+                saveConfig();
                 return true;
             }
         }
@@ -231,8 +202,81 @@ public class Main extends JavaPlugin
         vector.setZ(z);
 
         vectors.add(vector);
+
+        getConfig().set("locations", locations);
+        getConfig().set("vectors", vectors);
+        saveConfig();
         return false;
     }
 
+    /**
+     *
+     * @param location location of launchpad to remove
+     * @return true if location found and removed, else false
+     */
+    public boolean removeLaunchpad(Location location)
+    {
+        for(int i = 0; i < locations.size(); i++)
+        {
+            if(locations.get(i).getX() == location.getX()
+            && locations.get(i).getY() == location.getY()
+            && locations.get(i).getZ() == location.getZ())
+            {
+                //location found, remove the properties
+                locations.remove(i);
+                vectors.remove(i);
 
+                getConfig().set("locations", locations);
+                getConfig().set("vectors", vectors);
+                saveConfig();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * method used for check command to give player details about the launchpad's properties
+     * @param player player that called the command
+     * @param location location to check
+     */
+    public void isLaunchpad(Player player, Location location)
+    {
+        for(int i = 0; i < locations.size(); i++)
+        {
+            if(locations.get(i).getX() == location.getX()
+                    && locations.get(i).getY() == location.getY()
+                    && locations.get(i).getZ() == location.getZ())
+            {
+                //location found
+                player.sendMessage(ChatColor.GREEN + "Launchpad data found!");
+                player.sendMessage(ChatColor.GRAY + "Properties: X: " + vectors.get(i).getX() + ", Y: " + vectors.get(i).getY() + ", Z: " + vectors.get(i).getZ());
+                return;
+            }
+        }
+        player.sendMessage(ChatColor.YELLOW + "No Launchpad data found.");
+    }
+
+    /**
+     * method used for check to see if this is a launchpad to then launch the player
+     * @param location location to check
+     * @return Vector properties for located launchpad
+     */
+    public Vector isLp(Location location)
+    {
+        Vector vector;
+        for(int i = 0; i < locations.size(); i++)
+        {
+            if(locations.get(i).getX() == location.getX()
+                    && locations.get(i).getY() == location.getY()
+                    && locations.get(i).getZ() == location.getZ())
+            {
+                //launchpad found
+                vector = vectors.get(i);
+                return vector;
+            }
+        }
+        //not a launchpad
+        return null;
+    }
 }

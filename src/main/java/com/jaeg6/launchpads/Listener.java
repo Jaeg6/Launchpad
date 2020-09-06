@@ -5,6 +5,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 public class Listener implements org.bukkit.event.Listener {
 
@@ -30,11 +31,17 @@ public class Listener implements org.bukkit.event.Listener {
         if(p.getWorld().getName().equals("world_nether"))
         {
             //check block is a gold pressure plate
-            Block b = event.getTo().getBlock().getLocation().add(0, 1, 0).getBlock();
+            Block b = event.getTo().getBlock().getLocation().getBlock();
             if(b.getBlockData().getMaterial().equals(Material.LIGHT_WEIGHTED_PRESSURE_PLATE))
             {
                 //review config file to see if this specific gold pressure plate
-                p.sendMessage("You're standing on a gold pressure plate!");
+                Vector vector = main.isLp(b.getLocation());
+                if(!(vector == null))
+                {
+                    //is a launchpad
+                    //launch player with retrieved properties
+                    p.setVelocity(vector);
+                }
                 return;
             }
         }

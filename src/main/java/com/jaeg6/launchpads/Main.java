@@ -10,18 +10,18 @@ package com.jaeg6.launchpads;
         import org.bukkit.plugin.PluginManager;
         import org.bukkit.plugin.java.JavaPlugin;
         import org.bukkit.util.Vector;
-
-        import java.lang.reflect.Array;
         import java.util.ArrayList;
-        import java.util.HashMap;
 
 public class Main extends JavaPlugin
 {
     //To store the current locations of activated launchpads
-    public ArrayList<Location> locations = new ArrayList<Location>();
+    public ArrayList<Location> locations = new ArrayList<>();
+
+    public ArrayList<Integer> test1 = new ArrayList<>();
+    public ArrayList<Integer> test2 = new ArrayList<>();
 
     //To store the velocity direction/power properties
-    public ArrayList<Vector> vectors = new ArrayList<Vector>();
+    public ArrayList<Vector> vectors = new ArrayList<>();
 
     @Override
     public void onEnable()
@@ -59,89 +59,179 @@ public class Main extends JavaPlugin
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
+        try {
+            if (sender instanceof Player) {
+                //TEMPORARY COMMANDS FOR TESTING
+                if (cmd.getName().toLowerCase().equals("lptest1")) {
+                    test1.add(1);
+                    test1.add(2);
+                    test1.add(3);
 
-        if(sender instanceof Player)
-        {
-            Player player = (Player) sender;
+                    test2.add(6);
+                    test2.add(5);
+                    test2.add(4);
 
-            //command executed by player
-            String lowerCmd = cmd.getName().toLowerCase();
+                    getConfig().set("test1", test1);
+                    getConfig().set("test2", test2);
+                    saveConfig();
 
-            if (lowerCmd.equals("lp"))
-            {
-                //launchpad command
-                //Check to make sure player is looking at a pressure plate, and one of the commands was executed correctly.
-                Block b = player.getTargetBlock(null, 100);
-                if (b.getBlockData().getMaterial().equals(Material.LIGHT_WEIGHTED_PRESSURE_PLATE)
-                        && (args.length == 1 && (args[0].toLowerCase().equals("clear") || args[0].toLowerCase().equals("check"))
-                        || (args.length == 4 && args[0].toLowerCase().equals("set"))))
-                {
-                    System.out.println("Arguments found: " + args.length);
+                    sender.sendMessage("Done. Check console.");
+                    return true;
+                }
 
-                    switch (args[0].toLowerCase())
-                    {
-                        case "set":
-                            //Set selected pressure plate to be a launchpad
-                            //If selected plate is already a launchpad; overwrite the old properties.
+                if (cmd.getName().toLowerCase().equals("lptest2")) {
+                    test1.add(4);
+                    test1.add(5);
+                    test1.add(6);
 
-                            //set command
-                            sender.sendMessage(ChatColor.GREEN + "Launchpad successfully!");
-                            sender.sendMessage((ChatColor.GRAY + "" + ChatColor.ITALIC +  "Velocity vectors: X: " + args[1] + ", Y: " + args[2] + ", Z: " + args[3]));
+                    test2.add(3);
+                    test2.add(2);
+                    test2.add(1);
 
-                            //Call a function here and give it the x y and, z properties
+                    getConfig().set("test1", test1);
+                    getConfig().set("test2", test2);
+                    saveConfig();
 
-                            return true;
-
-                        case "clear":
-                            //search for pressure plate and clear its properties, making it a normal pressure plate again
-
-                            //clear command
-                            sender.sendMessage(ChatColor.GREEN + "Launchpad properties cleared!");
-                            sender.sendMessage((ChatColor.GRAY + "Cleared at: X: " + b.getLocation().getBlockX() + ", Y: " + b.getLocation().getBlockY() + ", Z: " + b.getLocation().getBlockZ()));
-                            return true;
-
-                        case "check":
-                            //Search through arraylist/config for target plate's velocity properties
-
-                            if(locations.isEmpty())
-                            {
-                                sender.sendMessage("No data found");
-                                return true;
-                            }
-
-                            return true;
-
-                        default:
-                            sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "invalid arguments");
-                            sender.sendMessage(ChatColor.RED + "Try /<command> <set> <x> <y> <z>");
-                            return true;
+                    sender.sendMessage("Done. Check console.");
+                    return true;
+                }
+                if (cmd.getName().toLowerCase().equals("lpclear")) {
+                    for (int i = test1.size() - 1; i >= 0; i--) {
+                        test1.remove(i);
+                        test2.remove(i);
                     }
+                    getConfig().set("test1", test1);
+                    getConfig().set("test2", test2);
+                    saveConfig();
+                    return true;
                 }
-                else
-                {
-                    sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "please make sure you're looking at a gold pressure plate");
-                    sender.sendMessage(ChatColor.RED + "and check your arguments: /<command> <set/clear/check> <x> <y> <z>");
+                //END OF TEST COMMANDS
+
+
+                Player player = (Player) sender;
+
+                //command executed by player
+                String lowerCmd = cmd.getName().toLowerCase();
+
+                if (lowerCmd.equals("lp")) {
+                    //launchpad command
+                    //Check to make sure player is looking at a pressure plate, and one of the commands was executed correctly.
+                    Block b = player.getTargetBlock(null, 100);
+                    if (b.getBlockData().getMaterial().equals(Material.LIGHT_WEIGHTED_PRESSURE_PLATE)
+                            && (args.length == 1 && (args[0].toLowerCase().equals("clear") || args[0].toLowerCase().equals("check"))
+                            || (args.length == 4 && args[0].toLowerCase().equals("set")))) {
+                        System.out.println("Arguments found: " + args.length);
+
+                        switch (args[0].toLowerCase()) {
+                            case "set":
+                                //Set selected pressure plate to be a launchpad
+                                //If selected plate is already a launchpad; overwrite the old properties.
+
+                                //set command
+                                if (setLaunchpad(b.getLocation(), Double.parseDouble(args[1]), Double.parseDouble(args[2]), Double.parseDouble(args[3])))
+                                {
+                                    sender.sendMessage(ChatColor.GREEN + "Launchpad created successfully! (overwrote old properties)");
+                                }
+                                else
+                                {
+                                    sender.sendMessage(ChatColor.GREEN + "Launchpad successfully!");
+                                }
+                                sender.sendMessage((ChatColor.GRAY + "" + ChatColor.ITALIC + "Velocity vectors: X: " + args[1] + ", Y: " + args[2] + ", Z: " + args[3]));
+                                return true;
+
+                            case "clear":
+                                //search for pressure plate and clear its properties, making it a normal pressure plate again
+
+                                //clear command
+                                sender.sendMessage(ChatColor.GREEN + "Launchpad properties cleared!");
+                                sender.sendMessage((ChatColor.GRAY + "Cleared at: X: " + b.getLocation().getBlockX() + ", Y: " + b.getLocation().getBlockY() + ", Z: " + b.getLocation().getBlockZ()));
+                                return true;
+
+                            case "check":
+                                //Search through arraylist/config for target plate's velocity properties
+
+                                if (locations.isEmpty()) {
+                                    sender.sendMessage("No data found");
+                                    return true;
+                                }
+
+                                return true;
+
+                            default:
+                                sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "invalid arguments");
+                                sender.sendMessage(ChatColor.RED + "Try /<command> <set> <x> <y> <z>");
+                                return true;
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "please make sure you're looking at a gold pressure plate");
+                        sender.sendMessage(ChatColor.RED + "and check your arguments: /<command> <set/clear/check> <x> <y> <z>");
+                    }
+                    return true;
+                } else {
+                    //should use a default "command not recognized" here
+                    return true;
                 }
-                return true;
-            }
-            else
-            {
-                //should use a default "command not recognized" here
-                return true;
-            }
-        }
-        else if(cmd.getName().toLowerCase().equals("lpdebug"))
-        {
-            System.out.println("\nLocations isEmpty: " + locations.isEmpty()
+            } else if (cmd.getName().toLowerCase().equals("lpdebug")) {
+                System.out.println("\nLocations isEmpty: " + locations.isEmpty()
                         + "\n" + "Vectors isEmpty: " + vectors.isEmpty());
 
-            return true;
+                return true;
+            } else {
+                System.err.println("This command can only be executed by a player.");
+                return true;
+            }
         }
-        else
+        catch (NumberFormatException e)
         {
-            System.err.println("This command can only be executed by a player.");
+            //Player put non number values as vector arguments
+            sender.sendMessage(ChatColor.DARK_RED + "Error: " + ChatColor.RED + "one or more vector arguments is not an actual number.");
             return true;
         }
+    }
+
+    /**
+     *
+     * @param location location data for new launchpad
+     * @param x vector x
+     * @param y vector y
+     * @param z vector z
+     * @return True if location/vector data already exist, false if new location/vector data was and added
+     */
+    public boolean setLaunchpad(Location location, double x, double y, double z)
+    {
+        Vector vector;
+        //check to make sure location is vacant
+        for(int i = 0; i < locations.size(); i++)
+        {
+            if(locations.get(i).getX() == location.getX()
+            && locations.get(i).getY() == location.getY()
+            && locations.get(i).getZ() == location.getZ())
+            {
+                //location exists
+                //overwrite location
+                locations.set(i, location);
+
+                //create/overwrite new vector
+                vector = new Vector();
+                vector.setX(x);
+                vector.setY(y);
+                vector.setZ(z);
+
+                vectors.set(i, vector);
+                return true;
+            }
+        }
+        //location not found or list is empty
+        //add location and vector
+        locations.add(location);
+
+        vector = new Vector();
+        vector.setX(x);
+        vector.setY(y);
+        vector.setZ(z);
+
+        vectors.add(vector);
+        return false;
     }
 
 

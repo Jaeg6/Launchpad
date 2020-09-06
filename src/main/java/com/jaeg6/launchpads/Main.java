@@ -10,12 +10,15 @@ package com.jaeg6.launchpads;
         import org.bukkit.plugin.PluginManager;
         import org.bukkit.plugin.java.JavaPlugin;
         import org.bukkit.util.Vector;
+
         import java.util.ArrayList;
+
+        import static org.bukkit.Bukkit.getWorld;
 
 public class Main extends JavaPlugin
 {
     //To store the current locations of activated launchpads
-    public ArrayList<Location> locations = new ArrayList<>();
+    public ArrayList<String> locations = new ArrayList<>();
 
     //To store the velocity direction/power properties
     public ArrayList<Vector> vectors = new ArrayList<>();
@@ -36,12 +39,14 @@ public class Main extends JavaPlugin
 
         if (!(getConfig().get("locations") == null))
         {
-            locations = (ArrayList<Location>) getConfig().get("locations");
+            locations = (ArrayList<String>) getConfig().get("locations");
+            saveConfig();
         }
 
         if (!(getConfig().get("vectors") == null))
         {
             vectors = (ArrayList<Vector>) getConfig().get("vectors");
+            saveConfig();
         }
 
     }
@@ -51,6 +56,8 @@ public class Main extends JavaPlugin
     {
         getLogger().info("LaunchPads disabled!");
 
+        getConfig().set("locations", locations);
+        getConfig().set("vectors", vectors);
         saveConfig();
     }
 
@@ -66,7 +73,7 @@ public class Main extends JavaPlugin
                 //command executed by player
                 String lowerCmd = cmd.getName().toLowerCase();
 
-                if (lowerCmd.equals("lp"))
+                if (lowerCmd.equals("lup"))
                 {
                     //launchpad command
                     //Check to make sure player is looking at a pressure plate, and one of the commands was executed correctly.
@@ -135,7 +142,7 @@ public class Main extends JavaPlugin
                     return true;
                 }
             }
-            else if (cmd.getName().toLowerCase().equals("lpdebug"))
+            else if (cmd.getName().toLowerCase().equals("lupdebug"))
             {
                 System.out.println("\nLocations isEmpty: " + locations.isEmpty()
                         + "\n" + "Vectors isEmpty: " + vectors.isEmpty());
@@ -170,14 +177,14 @@ public class Main extends JavaPlugin
         //check to make sure location is vacant
         for(int i = 0; i < locations.size(); i++)
         {
-            if(locations.get(i).getX() == location.getX()
-            && locations.get(i).getY() == location.getY()
-            && locations.get(i).getZ() == location.getZ()
-            && locations.get(i).getWorld() == location.getWorld())
+            if(stringToLoc(locations.get(i)).getX() == location.getX()
+            && stringToLoc(locations.get(i)).getY() == location.getY()
+            && stringToLoc(locations.get(i)).getZ() == location.getZ()
+            && stringToLoc(locations.get(i)).getWorld() == location.getWorld())
             {
                 //location exists
                 //overwrite location
-                locations.set(i, location);
+                locations.set(i, locToString(location));
 
                 //create/overwrite new vector
                 vector = new Vector();
@@ -195,7 +202,7 @@ public class Main extends JavaPlugin
         }
         //location not found or list is empty
         //add location and vector
-        locations.add(location);
+        locations.add(locToString(location));
 
         vector = new Vector();
         vector.setX(x);
@@ -219,10 +226,10 @@ public class Main extends JavaPlugin
     {
         for(int i = 0; i < locations.size(); i++)
         {
-            if(locations.get(i).getX() == location.getX()
-            && locations.get(i).getY() == location.getY()
-            && locations.get(i).getZ() == location.getZ()
-            && locations.get(i).getWorld() == location.getWorld())
+            if(stringToLoc(locations.get(i)).getX() == location.getX()
+            && stringToLoc(locations.get(i)).getY() == location.getY()
+            && stringToLoc(locations.get(i)).getZ() == location.getZ()
+            && stringToLoc(locations.get(i)).getWorld() == location.getWorld())
             {
                 //location found, remove the properties
                 locations.remove(i);
@@ -246,10 +253,10 @@ public class Main extends JavaPlugin
     {
         for(int i = 0; i < locations.size(); i++)
         {
-            if(locations.get(i).getX() == location.getX()
-                    && locations.get(i).getY() == location.getY()
-                    && locations.get(i).getZ() == location.getZ()
-                    && locations.get(i).getWorld() == location.getWorld())
+            if(stringToLoc(locations.get(i)).getX() == location.getX()
+                    && stringToLoc(locations.get(i)).getY() == location.getY()
+                    && stringToLoc(locations.get(i)).getZ() == location.getZ()
+                    && stringToLoc(locations.get(i)).getWorld() == location.getWorld())
             {
                 //location found
                 player.sendMessage(ChatColor.GREEN + "Launchpad data found!");
@@ -270,10 +277,10 @@ public class Main extends JavaPlugin
         Vector vector;
         for(int i = 0; i < locations.size(); i++)
         {
-            if(locations.get(i).getX() == location.getX()
-                    && locations.get(i).getY() == location.getY()
-                    && locations.get(i).getZ() == location.getZ()
-                    && locations.get(i).getWorld() == location.getWorld())
+            if(stringToLoc(locations.get(i)).getX() == location.getX()
+                    && stringToLoc(locations.get(i)).getY() == location.getY()
+                    && stringToLoc(locations.get(i)).getZ() == location.getZ()
+                    && stringToLoc(locations.get(i)).getWorld() == location.getWorld())
             {
                 //launchpad found
                 vector = vectors.get(i);
@@ -282,5 +289,23 @@ public class Main extends JavaPlugin
         }
         //not a launchpad
         return null;
+    }
+
+    /**
+     *
+     * @param loc location to convert
+     * @return converted location to string
+     */
+    public static String locToString(Location loc){
+        return loc.getWorld().getName() + "!" + loc.getX() + "!" + loc.getY() + "!" + loc.getZ() + "!" + loc.getYaw() + "!" + loc.getPitch();
+    }
+
+    /**
+     *
+     * @param str string to convert
+     * @return converted string to location
+     */
+    public static Location stringToLoc(String str){
+        return new Location(getWorld(str.split("!")[0]), Double.parseDouble(str.split("!")[1]), Double.parseDouble(str.split("!")[2]), Double.parseDouble(str.split("!")[3]), Float.parseFloat(str.split("!")[4]), Float.parseFloat(str.split("!")[5]));
     }
 }

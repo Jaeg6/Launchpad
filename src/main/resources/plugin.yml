@@ -2,9 +2,9 @@ name: Launchpads
 version: 1.0-SNAPSHOT
 main: com.jaeg6.launchpads.Main
 commands:
-  lp:
+  lup:
     description: Set the gold pressure plate you're looking at as a launchpad of a sepcified velocity/vector (xyz)
     usage: /<command> <set/clear> <direction> <x> <y> <z>
-  lpdebug:
+  lupdebug:
     description: Command can only be executed on the console. Shows debugging information for this plugin
     usage: /<command>

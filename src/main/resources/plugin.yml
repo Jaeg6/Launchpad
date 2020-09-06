@@ -8,6 +8,3 @@ commands:
   lpdebug:
     description: Command can only be executed on the console. Shows debugging information for this plugin
     usage: /<command>
-  lptest:
-    description: testing command
-    usage: /<command>

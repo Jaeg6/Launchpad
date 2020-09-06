@@ -27,8 +27,6 @@ public class Listener implements org.bukkit.event.Listener {
         }
 
         Player p = event.getPlayer();
-        //check that player is in spawn world
-        if(p.getWorld().getName().equals("world_nether"))
         {
             //check block is a gold pressure plate
             Block b = event.getTo().getBlock().getLocation().getBlock();
